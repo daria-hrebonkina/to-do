@@ -1,0 +1,21 @@
+{
+    "name": "dashka/to-do",
+    "type": "project",
+    "require": {
+        "php": ">7.0",
+        "symfony/http-foundation": "^4.1",
+        "twig/twig": "^2.5"
+    },
+    "authors": [
+        {
+            "name": "Dashka",
+            "email": "dashka169@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "": "src/",
+            "Controllers\\": "src/Controllers/"
+        }
+    }
+}
