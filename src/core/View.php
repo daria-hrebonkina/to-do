@@ -3,6 +3,7 @@
 namespace core;
 
 
+use core\Components\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class View
@@ -20,7 +21,10 @@ class View
         static $twig = null;
         if ($twig === null) {
             $loader = new \Twig_Loader_Filesystem( dirname(__DIR__) . '/Views');
-            $twig = new \Twig_Environment($loader);
+            $twig = new \Twig_Environment($loader, ['debug' => true]);
+            $twig->addExtension(new \Twig_Extension_Debug());
+            $twig->addGlobal('userIsGuest', Auth::userIsGuest());
+            $twig->addGlobal('userId', Auth::getUser()->id ?? null);
         }
         return new Response($twig->render($template, $args));
     }

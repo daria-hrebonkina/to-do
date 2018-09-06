@@ -99,27 +99,40 @@ abstract class Model
         return static::$db;
     }
 
-    public static function findAll(array $params = [])
+    public static function findAll(array $params = [], $sort = [])
     {
         $values = [];
         $query = 'SELECT * FROM ' . static::tableName();
         if(!empty($params)) {
-            $query = static::addConditions($query, $params,$values);
+            $conditions = static::createConditions($params,$values);
+            $query .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+        if(!empty($sort)) {
+            $query.= ' ORDER BY ' . $sort['by'] . ' ' . $sort['directions'];
         }
         return static::find($query, $values);
     }
 
-    private static function addConditions($query, $params, &$values)
+    private static function createConditions($params, &$values)
     {
         $conditions = [];
         foreach ($params as $key => $value) {
-            $values[] = $value;
-            $conditions[] = '`' . $key .'` = ?';
+            if(is_array($value) && count($value) == 3) {
+                $conditions[] = '`' . $value[0] .'` '. $value[1] .' ?';
+                $values [] = $value[2];
+            } else {
+                $values[] = $value;
+                $conditions[] = '`' . $key .'` = ?';
+            }
         }
-        $query .= ' WHERE ' . implode(' AND ', $conditions);
-        return $query;
+
+        return $conditions;
     }
 
+    /**
+     * @param $params
+     * @return bool|null|static
+     */
     public static function findOne($params)
     {
         $values = [];
@@ -128,7 +141,8 @@ abstract class Model
             $values[] = $params;
             $query .= ' WHERE `id` = ? LIMIT 1';
         } elseif (is_array($params)) {
-            $query = static::addConditions($query, $params,$values);
+            $conditions = static::createConditions($params,$values);
+            $query .= ' WHERE ' . implode(' AND ', $conditions);
         } else {
             return false;
         }
@@ -146,6 +160,28 @@ abstract class Model
         $stmt = $db->prepare($query);
         $stmt->execute($values);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function update($params)
+    {
+        $values = [];
+        $query = 'UPDATE ' . static::tableName() . ' SET ';
+        $conditions = static::createConditions($params,$values);
+        $query .= implode(', ', $conditions);
+        $query .= " WHERE id = " . $this->id;
+        $db = static::getDB();
+        return $db->prepare($query)->execute($values);
+    }
+
+    public function delete($params = [])
+    {
+        $values = [];
+        $query = 'DELETE FROM ' . static::tableName();
+        $conditions = static::createConditions($params,$values);
+        $query .= implode(', ', $conditions);
+        $query .= " WHERE id = " . $this->id;
+        $db = static::getDB();
+        return $db->prepare($query)->execute($values);
     }
 
     /**
@@ -182,5 +218,15 @@ abstract class Model
         $tableName = explode('\\', static::class);
 
         return strtolower(end($tableName));
+    }
+
+    public function __toString()
+    {
+        return json_encode($this->attributes);
+    }
+
+    public function toArray()
+    {
+        return $this->attributes;
     }
 }

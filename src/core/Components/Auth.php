@@ -18,6 +18,11 @@ class Auth
         return null;
     }
 
+    public static function userIsGuest()
+    {
+        return empty(static::getUser()) ?? false;
+    }
+
     public static function signIn($login, $password)
     {
         $user = User::findOne(['login' => $login]);
@@ -57,5 +62,10 @@ class Auth
 
         $_SESSION['user'] = $user;
         return $user;
+    }
+
+    public static function logOut()
+    {
+        unset($_SESSION['user']);
     }
 }

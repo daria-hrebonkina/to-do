@@ -20,7 +20,7 @@ class Router
 
     public function __construct()
     {
-        $this->getRoutes();
+        $this->setRoutes();
     }
 
     /**
@@ -28,7 +28,7 @@ class Router
      *
      * @return array
      */
-    public function getRoutes()
+    public function setRoutes()
     {
         $this->routes = include __DIR__.'/../config/routes.php';
         return $this->routes;
@@ -67,19 +67,18 @@ class Router
      *
      * @return Response|void
      */
-    public function dispatch($url)
+    public function dispatch($path)
     {
-        if ($this->match(trim($url, '/'))) {
-            $controller = $this->params['controller'];
-            if (class_exists($controller)) {
-                $controller_object = new $controller($this->params);
-                $action = $this->params['action'];
-                return $controller_object->$action();
-            } else {
-                throw new \Exception("Controller class $controller not found");
-            }
-        } else {
+        if (!$this->match(trim($path, '/'))) {
             throw new \Exception('No route matched.', 404);
         }
+        $controllerName = $this->params['controller'];
+        if (!class_exists($controllerName)) {
+            throw new \Exception("Controller class $controllerName not found", 404);
+        }
+        $controller = new $controllerName($this->params);
+        $action = $this->params['action'];
+
+        return $controller->$action();
     }
 }

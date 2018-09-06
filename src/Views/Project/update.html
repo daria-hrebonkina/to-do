@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Edit project{% endblock %}
+
+{% block body %}
+
+<form action="/update-project?id={{ project.id }}" method="post">
+    <div class="col-6">
+        <div class="form-group">
+            <label for="projectTitle">Project title</label>
+            <input type="text" name="title" value="{{project.title}}" class="form-control" id="projectTitle" placeholder="Enter title">
+        </div>
+        <div class="form-group">
+            <label for="projectColor">Choose color</label>
+            <input type="color" name="color" value="{{project.color}}" class="form-control" id="projectColor">
+        </div>
+        <button class="btn btn-success">Save</button>
+    </div>
+</form>
+
+{% endblock %}

@@ -60,4 +60,9 @@ abstract class Controller
     protected function afterAction()
     {
     }
+
+    protected function redirect($uri)
+    {
+        return new Response('', 302, ['Location' => $uri]);
+    }
 }

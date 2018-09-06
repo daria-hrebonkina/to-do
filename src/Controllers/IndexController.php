@@ -18,7 +18,7 @@ class IndexController extends Controller
                 return View::renderTemplate('Index/sign-in.html', ['errors' => Auth::getErrors()]);
             }
 
-            return new Response('', 302, ['Location' => '/index']);
+            return new Response('', 302, ['Location' => '/tasks']);
         }
 
         return View::renderTemplate('Index/sign-in.html');
@@ -34,9 +34,15 @@ class IndexController extends Controller
                 return View::renderTemplate('Index/sign-up.html', ['errors' => Auth::getErrors()]);
             }
 
-            return new Response('', 302, ['Location' => '/project/index']);
+            return new Response('', 302, ['Location' => '/projects']);
         }
 
         return View::renderTemplate('Index/sign-up.html');
+    }
+
+    public function logoutAction()
+    {
+        Auth::logOut();
+        return new Response('', 302, ['Location' => '/sign-in']);
     }
 }
