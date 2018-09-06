@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Edit task{% endblock %}
+
+{% block body %}
+
+<form action="/update-task?id={{ task.id }}" method="post">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="taskTitle">Title</label>
+            <input class="form-control" type="text" name="title" id="taskTitle" value="{{ task.title }}">
+        </div>
+        <div class="form-group">
+            <label for="taskPriority">Priority</label>
+            <select class="form-control" id="taskPriority" name="priority">
+                <option value="2" {% if task.priority == 2  %} selected {% endif %}>High</option>
+                <option value="1" {% if task.priority == 1  %} selected {% endif %}>Middle</option>
+                <option value="0" {% if task.priority == 0  %} selected {% endif %}>Low</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="taskDate">Task due date</label>
+            <input type="datetime-local" name="date" id="taskDate" value="{{task.date|date("Y-m-d\\TH:i:s")}}" class="form-control" id="taskDate">
+        </div>
+        <div class="form-group">
+            <label for="taskProject">Select project</label>
+            <select class="form-control" name="project_id"  id="taskProject">
+                {% for project in projects %}
+                    <option value="{{project.id}}" {% if task.project_id == project.id  %} selected {% endif %}>{{project.title}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button class="btn btn-success">Save</button>
+    </div>
+</form>
+
+{% endblock %}
